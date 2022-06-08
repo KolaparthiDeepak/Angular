@@ -1,4 +1,3 @@
-import { TypeModifier } from '@angular/compiler';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
@@ -76,8 +75,9 @@ export class ContactComponent implements OnInit {
         // clear previous error message (if any)
         this.formErrors[field as keyof typeof this.formErrors] = '';
         const control = form.get(field);
+        const temp=this.formErrors;
         if (control && control.dirty && !control.valid) {
-          const messages = this.validationMessages[field as keyof typeof control.get];
+          const messages = this.validationMessages[field as keyof typeof temp];
           for (const key in control.errors) {
             if (control.errors.hasOwnProperty(key)) {
               this.formErrors[field as keyof typeof this.formErrors] += messages[key as keyof typeof messages] + ' ';
