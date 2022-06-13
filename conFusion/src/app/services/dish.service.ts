@@ -6,9 +6,7 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { baseURL } from '../shared/baseurl';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class DishService {
 
   constructor(private http: HttpClient) { }
