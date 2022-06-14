@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
-import { flyInOut } from '../animations/app.animation';
+import { flyInOut, expand } from '../animations/app.animation';
+import { FeedbackService } from '../services/feedback.service';
 
 @Component({
   selector: 'app-contact',
@@ -12,15 +13,20 @@ import { flyInOut } from '../animations/app.animation';
     'style': 'display: block;'
   },
   animations: [
-    flyInOut()
+    flyInOut(),
+    expand()
   ]
 })
 
 export class ContactComponent implements OnInit {
 
   feedbackForm!: FormGroup;
-  feedback!: Feedback;
+  feedback!: Feedback | null;
   contactType = ContactType;
+  errMess!: string;
+  isLoading!: boolean;
+  isShowing!: boolean;
+  feedbackcopy!: Feedback | null
   @ViewChild('fform') feedbackFormDirective!: NgForm;
 
   formErrors = {
@@ -51,8 +57,11 @@ export class ContactComponent implements OnInit {
     },
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+    private feedbackService: FeedbackService) {
     this.createForm();
+    this.isLoading = false;
+    this.isShowing = false;
    }
 
   ngOnInit(): void {
@@ -97,8 +106,28 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit() {
+    this.isLoading = true;
     this.feedback = this.feedbackForm.value;
     console.log(this.feedback);
+    this.feedbackService.putFeedback(this.feedback!)
+      .subscribe(
+        feedback => {
+          this.feedback = this.feedback;
+          console.log(this.feedback);
+        },
+        errmess => { 
+          this.feedback = null; 
+          this.feedbackcopy = null; 
+          this.errMess = <any>errmess; 
+        },
+        () => {
+          this.isShowing = true;
+          setTimeout(() => {
+            this.isShowing = false;
+            this.isLoading = false;
+          }, 5000);
+        }
+      );
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',
